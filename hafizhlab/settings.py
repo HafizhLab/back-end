@@ -45,8 +45,15 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     'rest_framework',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     'hafizhlab.accounts',
 ]
 
@@ -132,6 +139,12 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+# Site
+# https://docs.djangoproject.com/en/3.1/ref/contrib/sites/
+
+SITE_ID = 1
 
 
 # Static files (CSS, JavaScript, Images)
