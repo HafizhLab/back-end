@@ -40,6 +40,7 @@ if 'ALLOWED_HOSTS' in os.environ:
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +49,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'hafizhlab.accounts',
+    'hafizhlab.challenges',
+    'hafizhlab.games',
+    'hafizhlab.quran',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +81,8 @@ TEMPLATES = [
         },
     },
 ]
+
+ASGI_APPLICATION = 'hafizhlab.asgi.application'
 
 WSGI_APPLICATION = 'hafizhlab.wsgi.application'
 
