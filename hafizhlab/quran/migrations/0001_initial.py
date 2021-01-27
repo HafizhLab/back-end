@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Ayah',
             fields=[
-                ('id', models.CharField(editable=False, max_length=6, primary_key=True, serialize=False)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('number', models.PositiveSmallIntegerField()),
                 ('text', models.TextField()),
                 ('juz', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='quran.juz')),
