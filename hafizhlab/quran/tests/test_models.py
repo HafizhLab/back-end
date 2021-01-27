@@ -3,11 +3,11 @@ from django.test import TestCase
 from hafizhlab.quran.models import Ayah, Juz, Surah
 
 
-class VerseTestCase(TestCase):
+class AyahTestCase(TestCase):
 
-    def test_generated_verse_id(self):
-        """Test verse id is generated properly based on verse chapter
-        and verse number.
+    def test_generated_ayah_id(self):
+        """Test ayah id is generated properly based on ayah's surah
+        and ayah's number.
         """
 
         j = Juz.objects.create(id=1)
