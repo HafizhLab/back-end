@@ -30,7 +30,6 @@ class Surah(models.Model):
 
 class Ayah(models.Model):
     """Simple representation of Quran's Ayah"""
-    id = models.CharField(max_length=6, primary_key=True, editable=False)
     juz = models.ForeignKey(Juz, on_delete=models.CASCADE)
     surah = models.ForeignKey(Surah, on_delete=models.CASCADE)
     number = models.PositiveSmallIntegerField()
@@ -46,7 +45,3 @@ class Ayah(models.Model):
 
     def __str__(self):
         return str(self.id)
-
-    def save(self, *args, **kwargs):
-        self.id = '{}:{}'.format(self.surah.id, self.number)
-        super().save(*args, **kwargs)
