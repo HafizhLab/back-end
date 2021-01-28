@@ -95,3 +95,7 @@ class UserTestCase(TestCase):
     def test_get_full_name_without_nickname(self):
         user = User(full_name='John Doe')
         self.assertEqual(user.get_short_name(), 'John')
+
+    def test_get_short_name_none(self):
+        user = User()
+        self.assertEqual(user.get_short_name(), None)
