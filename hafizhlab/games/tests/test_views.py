@@ -14,6 +14,34 @@ from hafizhlab.quran.models import Juz, Surah
 User = get_user_model()
 
 
+class GameSessionRetrieveAPITestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create()
+        cls.user_token = Token.objects.create(user=cls.user)
+        cls.challenge = Challenge.objects.create(
+            mode=Challenge.Mode.AYAH_BASED,
+            scope=Juz(id=1),
+        )
+        cls.game = GameSession.objects.create(
+            mode=GameSession.Mode.SINGLE_PLAYER,
+            challenge=cls.challenge,
+        )
+
+    def setUp(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token {}'.format(self.user_token.key))
+
+    def test_get_game_using_public_code(self):
+        response = self.client.get(reverse(
+            'game-code',
+            kwargs={'public_code': self.game.public_code}
+        ))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = json.loads(response.content)
+        self.assertEqual(data['room_id'], str(self.game.room_id))
+
+
 class GameSessionAPITestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
