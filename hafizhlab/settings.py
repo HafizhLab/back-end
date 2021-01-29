@@ -40,6 +40,7 @@ if 'ALLOWED_HOSTS' in os.environ:
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'hafizhlab.accounts',
     'hafizhlab.challenges',
+    'hafizhlab.games',
     'hafizhlab.quran',
 ]
 
@@ -86,6 +88,8 @@ TEMPLATES = [
         },
     },
 ]
+
+ASGI_APPLICATION = 'hafizhlab.asgi.application'
 
 WSGI_APPLICATION = 'hafizhlab.wsgi.application'
 
@@ -153,3 +157,14 @@ SITE_ID = 1
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Rest Framework
+# https://www.django-rest-framework.org/api-guide/settings/
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
