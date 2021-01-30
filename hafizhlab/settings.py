@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'hafizhlab.accounts',
     'hafizhlab.challenges',
     'hafizhlab.quran',
+    'hafizhlab.progress',
 ]
 
 MIDDLEWARE = [
