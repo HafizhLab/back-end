@@ -37,25 +37,34 @@ def get_questions(request):
     ayah = scope.ayah_set.all()[random.randrange(ayah_count)]
 
     if mode.lower() == 'word':
-        options = []
+        key = 'questions'
+        questions = []
         ayah_words = ayah.text.split()
-        for word in ayah_words:
-            option = [{
-                'text': ayah.word,
+        q_text = ayah_words[:3]
+        q_remaining = ayah_words[3:]
+        for word in q_remaining:
+            options = [{
+                'text': word,
                 'isCorrect': True,
                 'selected': False,
             }]
-            for other in trained_model.next_model(word):
-                option.append({
+            for other in trained_model.next_word(q_text):
+                options.append({
                     'text': other[1],
                     'isCorrect': False,
                     'selected': False,
                 })
-            options.append(option)
+            questions.append({
+                'text': ' '.join(q_text),
+                'options': options,
+            })
+            q_text.append(q_remaining.pop(0))
+        value = questions
     elif mode.lower() == 'verse':
+        key = 'options'
         next_ayah = Ayah.objects.get(id=ayah.id+1)
         options = [{
-            'text': ayah.text,
+            'text': next_ayah.text,
             'isCorrect': True,
             'selected': False,
         }]
@@ -65,6 +74,7 @@ def get_questions(request):
                 'isCorrect': False,
                 'selected': False,
             })
+        value = options
     else:
         return HttpResponseBadRequest(
             "mode must either 'verse' or 'word'"
@@ -74,7 +84,7 @@ def get_questions(request):
 
     return JsonResponse({
         'text': ayah.text,
-        'options': options,
+        key: value,
         'mode': mode,
         'title': ayah.surah.english_name,
         'number': ayah.number,
