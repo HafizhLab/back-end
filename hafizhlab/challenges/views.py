@@ -3,6 +3,7 @@ import pickle
 import random
 import sys
 
+from django.db.models.functions import Length
 from django.http import HttpResponseBadRequest, JsonResponse
 
 from hafizhlab.quran.models import Ayah, Juz, Surah
@@ -33,32 +34,41 @@ def get_questions(request):
             "type must either 'juz' or 'surah'"
         )
 
-    ayah_count = scope.ayah_set.count()
-    ayah = scope.ayah_set.all()[random.randrange(ayah_count)]
+    ayah_q = scope.ayah_set.annotate(text_len=Length('text')).filter(text_len__gt=50)
+    ayah = ayah_q.all()[random.randrange(ayah_q.count())]
 
     if mode.lower() == 'word':
         key = 'questions'
         questions = []
         ayah_words = ayah.text.split()
-        q_text = ayah_words[:3]
-        q_remaining = ayah_words[3:]
+        q_text = ayah_words[:4]
+        q_remaining = ayah_words[4:]
         for word in q_remaining:
             options = [{
                 'text': word,
                 'isCorrect': True,
                 'selected': False,
             }]
-            for other in trained_model.next_word(q_text):
+            for other in trained_model.next_word(' '.join(q_text)):
+                if other[0] in {o['text'] for o in options}:
+                    continue
                 options.append({
-                    'text': other[1],
+                    'text': other[0],
                     'isCorrect': False,
                     'selected': False,
                 })
+            for other in random.sample(q_text[:-1], max(0, 4 - len(options))):
+                options.append({
+                    'text': other,
+                    'isCorrect': False,
+                    'selected': False,
+                })
+            random.shuffle(options)
             questions.append({
                 'text': ' '.join(q_text),
                 'options': options,
             })
-            q_text.append(q_remaining.pop(0))
+            q_text.append(word)
         value = questions
     elif mode.lower() == 'verse':
         key = 'options'
@@ -74,13 +84,15 @@ def get_questions(request):
                 'isCorrect': False,
                 'selected': False,
             })
+        random.shuffle(options)
         value = options
     else:
         return HttpResponseBadRequest(
             "mode must either 'verse' or 'word'"
         )
 
-    random.shuffle(options)
+    from pprint import pprint
+    pprint(value)
 
     return JsonResponse({
         'text': ayah.text,
