@@ -31,14 +31,11 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = DEBUG = os.environ.get('DEBUG', 'True').title() == 'True'
 
-ALLOWED_CORS_ORIGINS = os.environ.get('ALLOWED_CORS_ORIGINS', 'localhost:3000').split(',')
-
-CORS_ALLOW_ALL_ORIGINS = True
-
 ALLOWED_HOSTS = []
 
 if 'ALLOWED_HOSTS' in os.environ:
     ALLOWED_HOSTS.extend(os.environ['ALLOWED_HOSTS'].split(','))
+
 
 # Application definition
 
@@ -165,3 +162,11 @@ STATIC_ROOT = BASE_DIR / 'static'
 # https://docs.djangoproject.com/en/3.1/topics/email/
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# Django CORS headers
+# https://github.com/adamchainz/django-cors-headers#configuration
+
+ALLOWED_CORS_ORIGINS = os.environ.get('ALLOWED_CORS_ORIGINS', 'localhost:3000').split(',')
+
+CORS_ALLOW_ALL_ORIGINS = True
