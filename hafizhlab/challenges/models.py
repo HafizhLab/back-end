@@ -14,8 +14,8 @@ class Challenge(models.Model):
         WORD_BASED = 'word'
 
     SCOPE_CHOICES = operator.or_(
-        models.Q(app_label='quran', model='Juz'),
-        models.Q(app_label='quran', model='Surah'),
+        models.Q(app_label='quran', model='juz'),
+        models.Q(app_label='quran', model='surah'),
     )
 
     owner = models.ForeignKey(
