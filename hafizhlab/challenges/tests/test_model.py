@@ -1,8 +1,20 @@
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from hafizhlab.challenges.models import Challenge, Question
+from hafizhlab.challenges.models import (
+    Challenge, Question, scope_type_choices_q,
+)
 from hafizhlab.quran.models import Ayah, Juz, Surah
+
+
+class ChallengeTest(TestCase):
+    def test_scope_type_choices_q(self):
+        cts = ContentType.objects.filter(scope_type_choices_q())
+        self.assertCountEqual(
+            [ct.model_class() for ct in cts],
+            Challenge.SCOPE_TYPE_CHOICES.values(),
+        )
 
 
 class QuestionTest(TestCase):
