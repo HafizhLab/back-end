@@ -11,8 +11,8 @@ from hafizhlab.quran.models import Juz, Surah
 
 
 def scope_type_choices_q():
-    cts = ContentType.objects.get_for_models(Challenge.SCOPE_TYPE_CHOICES.values())
-    return models.Q(id__in=(ct.id for ct in cts))
+    ct_dict = ContentType.objects.get_for_models(*Challenge.SCOPE_TYPE_CHOICES.values())
+    return models.Q(id__in=(ct.id for ct in ct_dict.values()))
 
 
 class Challenge(models.Model):
