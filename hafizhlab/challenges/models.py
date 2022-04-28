@@ -26,13 +26,13 @@ class Challenge(models.Model):
     is_public = models.BooleanField(default=False)
     mode = models.CharField(max_length=4, choices=Mode.choices)
 
-    scope_ct = models.ForeignKey(
+    scope_type = models.ForeignKey(
         ContentType,
         on_delete=models.PROTECT,
         limit_choices_to=SCOPE_CHOICES,
     )
     scope_id = models.PositiveSmallIntegerField()
-    scope = GenericForeignKey('scope_ct', 'scope_id')
+    scope = GenericForeignKey('scope_type', 'scope_id')
 
 
 class Question(models.Model):
