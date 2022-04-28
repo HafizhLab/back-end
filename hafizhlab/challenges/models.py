@@ -7,16 +7,23 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from hafizhlab.quran.models import Juz, Surah
+
+
+def scope_type_choices_q():
+    cts = ContentType.objects.get_for_models(Challenge.SCOPE_TYPE_CHOICES.values())
+    return models.Q(id__in=(ct.id for ct in cts))
+
 
 class Challenge(models.Model):
     class Mode(models.TextChoices):
         AYAH_BASED = 'ayah'
         WORD_BASED = 'word'
 
-    SCOPE_CHOICES = operator.or_(
-        models.Q(app_label='quran', model='juz'),
-        models.Q(app_label='quran', model='surah'),
-    )
+    SCOPE_TYPE_CHOICES = {
+        'juz': Juz,
+        'surah': Surah,
+    }
 
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -29,7 +36,7 @@ class Challenge(models.Model):
     scope_type = models.ForeignKey(
         ContentType,
         on_delete=models.PROTECT,
-        limit_choices_to=SCOPE_CHOICES,
+        limit_choices_to=scope_type_choices_q,
     )
     scope_id = models.PositiveSmallIntegerField()
     scope = GenericForeignKey('scope_type', 'scope_id')
