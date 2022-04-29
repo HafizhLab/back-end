@@ -41,12 +41,11 @@ def get_questions(request):
     mode = challenge.mode
     scope = challenge.scope
 
-    ayah_q = scope.ayah_set.annotate(text_len=Length('text')).filter(text_len__gt=50)
-    ayah = ayah_q.all()[random.randrange(ayah_q.count())]
-
     if mode.lower() == 'word':
         key = 'questions'
         questions = []
+        ayah_q = scope.ayah_set.annotate(text_len=Length('text')).filter(text_len__gt=50)
+        ayah = ayah_q[random.randrange(ayah_q.count())]
         ayah_words = ayah.text.split()
         q_text = ayah_words[:4]
         q_remaining = ayah_words[4:]
@@ -81,6 +80,8 @@ def get_questions(request):
         value = questions
     elif mode.lower() == 'verse':
         key = 'options'
+        ayah_q = scope.ayah_set.all()
+        ayah = ayah_q[random.randrange(ayah_q.count())]
         next_ayah = Ayah.objects.get(id=ayah.id+1)
         options = [{
             'text': next_ayah.text,
