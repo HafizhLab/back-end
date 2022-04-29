@@ -31,6 +31,7 @@ class Challenge(models.Model):
         null=True,
     )
     is_public = models.BooleanField(default=False)
+    is_generated = models.BooleanField(default=False)
     mode = models.CharField(max_length=4, choices=Mode.choices)
 
     scope_type = models.ForeignKey(
@@ -40,6 +41,9 @@ class Challenge(models.Model):
     )
     scope_id = models.PositiveSmallIntegerField()
     scope = GenericForeignKey('scope_type', 'scope_id')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Question(models.Model):

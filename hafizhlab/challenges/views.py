@@ -3,10 +3,12 @@ import pickle
 import random
 import sys
 
+from django.contrib.contenttypes.models import ContentType
 from django.db.models.functions import Length
 from django.http import HttpResponseBadRequest, JsonResponse
 
-from hafizhlab.quran.models import Ayah, Juz, Surah
+from hafizhlab.challenges.models import Challenge, Question
+from hafizhlab.quran.models import Ayah
 
 sys.path.append('machinelearning')
 
@@ -21,18 +23,23 @@ with open('machinelearning/ayahData.json') as f:
 
 
 def get_questions(request):
-    mode = request.GET['mode']
-    scope_type = request.GET['type']
-    scope_id = request.GET['number']
-
-    if scope_type.lower() == 'juz':
-        scope = Juz.objects.get(id=scope_id)
-    elif scope_type.lower() == 'surah':
-        scope = Surah.objects.get(id=scope_id)
+    if 'challenge' in request.GET:
+        challenge = Challenge.objects.get(id=request.GET['challenge'])
     else:
-        return HttpResponseBadRequest(
-            "type must either 'juz' or 'surah'"
+        try:
+            model = Challenge.SCOPE_TYPE_CHOICES[request.GET['type']]
+        except KeyError:
+            return HttpResponseBadRequest(
+                "type must either 'juz' or 'surah'"
+            )
+        challenge = Challenge.objects.create(
+            mode=request.GET['mode'],
+            scope_type=ContentType.objects.get_for_model(model),
+            scope_id=request.GET['number'],
         )
+
+    mode = challenge.mode
+    scope = challenge.scope
 
     ayah_q = scope.ayah_set.annotate(text_len=Length('text')).filter(text_len__gt=50)
     ayah = ayah_q.all()[random.randrange(ayah_q.count())]
@@ -43,6 +50,7 @@ def get_questions(request):
         ayah_words = ayah.text.split()
         q_text = ayah_words[:4]
         q_remaining = ayah_words[4:]
+        q_options = []
         for word in q_remaining:
             options = [{
                 'text': word,
@@ -69,6 +77,7 @@ def get_questions(request):
                 'options': options,
             })
             q_text.append(word)
+            q_options.append([o['text'] for o in options])
         value = questions
     elif mode.lower() == 'verse':
         key = 'options'
@@ -86,13 +95,17 @@ def get_questions(request):
             })
         random.shuffle(options)
         value = options
+        q_options = [o['text'] for o in options]
     else:
         return HttpResponseBadRequest(
             "mode must either 'verse' or 'word'"
         )
 
-    from pprint import pprint
-    pprint(value)
+    Question.objects.create(
+        challenge=challenge,
+        ayah=ayah,
+        options=q_options,
+    )
 
     return JsonResponse({
         'text': ayah.text,
@@ -100,4 +113,5 @@ def get_questions(request):
         'mode': mode,
         'title': ayah.surah.english_name,
         'number': ayah.number,
+        'challenge': challenge.id,
     })
