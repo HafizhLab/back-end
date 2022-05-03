@@ -44,4 +44,4 @@ class Ayah(models.Model):
         ]
 
     def __str__(self):
-        return str(self.id)
+        return f'{self.surah}: {self.number}'
